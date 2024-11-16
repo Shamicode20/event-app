@@ -26,6 +26,103 @@ include '../../includes/topbar.php';
 include '../../includes/sidebar.php';
 ?>
 
+<style>
+    /* Modal Styles */
+    .modal-content {
+        border-radius: 8px;
+        background-color: #ffffff;
+        /* Default light mode background */
+        color: #1B4965;
+        /* Default light mode text color */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .modal-header,
+    .modal-footer {
+        background-color: #f8f9fa;
+        /* Light background for modal header/footer */
+        border-color: #e9ecef;
+        /* Light border for modal header/footer */
+    }
+
+    .modal-body {
+        background-color: #ffffff;
+        /* Light background for modal body */
+        color: #1B4965;
+        /* Light text color for modal body */
+    }
+
+    body.dark-mode .modal-content {
+        background-color: #2c2c2c;
+        /* Dark mode background */
+        color: #e0e0e0;
+        /* Dark mode text color */
+    }
+
+    body.dark-mode .modal-header,
+    body.dark-mode .modal-footer {
+        background-color: #333;
+        /* Dark background for modal header/footer */
+        border-color: #444;
+        /* Dark border for modal header/footer */
+    }
+
+    body.dark-mode .modal-body {
+        background-color: #2c2c2c;
+        /* Dark mode background for modal body */
+        color: #e0e0e0;
+        /* Dark mode text color for modal body */
+    }
+
+    /* Buttons inside modals */
+    .modal-footer .btn {
+        font-weight: bold;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .modal-footer .btn-primary {
+        background-color: #4a90e2;
+        border-color: #4a90e2;
+        color: white;
+    }
+
+    .modal-footer .btn-primary:hover {
+        background-color: #3b78c2;
+        border-color: #3b78c2;
+    }
+
+    body.dark-mode .modal-footer .btn-primary {
+        background-color: #3b78c2;
+        /* Dark mode button background */
+        border-color: #3b78c2;
+        /* Dark mode button border */
+        color: white;
+        /* Maintain light text for visibility */
+    }
+
+    body.dark-mode .modal-footer .btn-primary:hover {
+        background-color: #336699;
+        /* Slightly darker on hover for dark mode */
+        border-color: #336699;
+    }
+
+    /* Scrollbar for modal body */
+    .modal-body::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb {
+        background-color: #dcdcdc;
+        /* Light mode scrollbar */
+        border-radius: 3px;
+    }
+
+    body.dark-mode .modal-body::-webkit-scrollbar-thumb {
+        background-color: #555;
+        /* Dark mode scrollbar */
+    }
+</style>
 
 <div id="page-content-wrapper">
     <div class="d-flex justify-content-between align-items-center mb-4">
