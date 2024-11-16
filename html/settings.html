@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Settings</title>
+    <!-- Google Fonts (Poppins) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+    <!-- Custom Styles -->
+    <style>
+        /* General Styles */
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: #f4f9fc; 
+            color: #1B4965; 
+            transition: background-color 0.3s, color 0.3s; 
+            overflow-x: hidden; 
+        }
+        .dark-mode { 
+            background-color: #121212; 
+            color: #e0e0e0; 
+        }
+
+        /* Sidebar */
+        .sidebar { 
+            background-color: #5FA8D3; 
+            color: #CAE9FF; 
+            min-width: 220px; 
+            height: 100vh; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            padding-top: 70px; 
+            transition: transform 0.3s ease, background-color 0.3s; 
+            z-index: 1000; 
+        }
+        .sidebar.collapsed { 
+            transform: translateX(-100%); 
+        }
+        .sidebar ul { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0; 
+        }
+        .sidebar ul li { 
+            padding: 0.8rem 1.5rem; 
+            display: flex; 
+            align-items: center; 
+            transition: background-color 0.2s; 
+        }
+        .sidebar ul li:hover { 
+            background-color: rgba(255, 255, 255, 0.2); 
+        }
+        .sidebar ul li a { 
+            color: #CAE9FF; 
+            text-decoration: none; 
+            font-weight: 500; 
+            margin-left: 10px; 
+            display: inline-block; 
+        }
+        .dark-mode .sidebar { 
+            background-color: #333; 
+            color: #f0f0f0; 
+        }
+        .dark-mode .sidebar ul li a { 
+            color: #e0e0e0; 
+        }
+
+        /* Top Navbar */
+        .top-navbar { 
+            background-color: #1B4965; 
+            color: white; 
+            padding: 1rem; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            z-index: 1001; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+        }
+        .navbar-brand { 
+            font-weight: 500; 
+            font-size: 1.2rem; 
+        }
+        .dark-mode .top-navbar { 
+            background-color: #333; 
+        }
+        .toggle-btn { 
+            font-size: 1.5rem; 
+            cursor: pointer; 
+            color: #CAE9FF; 
+            display: flex; 
+            align-items: center; 
+        }
+
+        /* Optional: Different color for Logout to distinguish it */
+        .sidebar ul li.logout a {
+            color: #FF6B6B; /* Example color for emphasis */
+        }
+
+        /* Main Content Wrapper */
+        #page-content-wrapper { 
+            flex: 1; 
+            padding: 6rem 2rem 2rem 2rem; /* Adjust padding to account for fixed navbar */
+            margin-left: 220px; 
+            transition: margin-left 0.3s ease; 
+        }
+        #page-content-wrapper.expanded { 
+            margin-left: 0; 
+        }
+
+        /* Cards */
+        .card { 
+            background-color: #FFFFFF; 
+            color: #1B4965; 
+            border: 1px solid #ddd; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+            transition: background-color 0.3s, color 0.3s; 
+        }
+        .dark-mode .card { 
+            background-color: #333; 
+            color: #e0e0e0; 
+            border-color: #444; 
+        }
+
+        /* Form Inputs */
+        .form-control { 
+            background-color: #fff; 
+            color: #1B4965; 
+            border: 1px solid #ddd; 
+            transition: background-color 0.3s, color 0.3s; 
+        }
+        .form-control:focus { 
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); 
+        }
+        .dark-mode .form-control { 
+            background-color: #444; 
+            color: #e0e0e0; 
+            border-color: #555; 
+        }
+
+        /* Buttons */
+        .btn-primary { 
+            background-color: #1B4965; 
+            border-color: #1B4965; 
+        }
+        .btn-primary:hover { 
+            background-color: #174057; 
+            border-color: #174057; 
+        }
+        .dark-mode .btn-primary { 
+            background-color: #555; 
+            border-color: #555; 
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) { 
+            .sidebar { 
+                transform: translateX(-100%); 
+                position: absolute; 
+            } 
+            .sidebar.collapsed { 
+                transform: translateX(0); 
+            } 
+            #page-content-wrapper { 
+                margin-left: 0; 
+                padding: 6rem 1rem 1rem 1rem; 
+            }
+            .top-navbar .navbar-brand { 
+                font-size: 1rem; 
+            }
+        }
+        @media (max-width: 576px) { 
+            #page-content-wrapper { 
+                padding: 6rem 0.8rem 0.8rem 0.8rem; 
+            }
+            .top-navbar { 
+                padding: 0.8rem; 
+            } 
+            .navbar-brand, .top-navbar span { 
+                font-size: 0.85rem; 
+            }
+        }
+
+        /* Dark Mode Styling for Forms and Modals */
+        .dark-mode .card { 
+            background-color: #333; 
+            color: #e0e0e0; 
+            border-color: #444; 
+        }
+        .dark-mode .btn-primary { 
+            background-color: #555; 
+            border-color: #555; 
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navbar -->
+    <div class="top-navbar">
+        <div class="d-flex align-items-center">
+            <span class="toggle-btn me-3" onclick="toggleSidebar()" aria-label="Toggle sidebar">☰</span>
+            <div class="navbar-brand">Admin Dashboard</div>
+        </div>
+        <div class="d-flex align-items-center">
+            <i class="bi bi-moon-fill me-3" onclick="toggleDarkMode()" style="cursor: pointer;" aria-label="Toggle dark mode"></i>
+            <span>Admin Name</span>
+        </div>
+    </div>
+
+    <div id="wrapper" style="display: flex;">
+
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar">
+            <ul>
+                <li><a href="home.html"><i class="bi bi-house-door-fill me-2"></i>Home</a></li>
+                <li><a href="events.html"><i class="bi bi-calendar-event-fill me-2"></i>Events</a></li>
+                <li><a href="users.html"><i class="bi bi-people-fill me-2"></i>Users</a></li>
+                <li><a href="settings.html"><i class="bi bi-gear-fill me-2"></i>Settings</a></li>
+                <li class="logout"><a href="logout.html"><i class="bi bi-box-arrow-right me-2"></i>Log Out</a></li>
+            </ul>
+        </div>
+
+        <!-- Page Content Wrapper -->
+        <div id="page-content-wrapper">
+            <h2>Settings</h2>
+
+            <!-- Profile Settings -->
+            <div class="card p-4 mb-4">
+                <h4>Profile Settings</h4>
+                <form id="profileSettingsForm">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <input type="text" class="form-control" id="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="profileImage" class="form-label">Profile Image</label>
+                        <input type="file" class="form-control" id="profileImage" accept="image/*">
+                        <small class="form-text text-muted">Choose an image to update your profile picture.</small>
+                        <img src="https://via.placeholder.com/150" alt="Profile Preview" id="profileImagePreview" class="mt-3" style="width: 150px; height: 150px; object-fit: cover; border-radius: 50%; display: none;">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Profile</button>
+                </form>
+            </div>
+
+            <!-- Password Settings -->
+            <div class="card p-4 mb-4">
+                <h4>Password Settings</h4>
+                <form id="passwordSettingsForm">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="currentPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Change Password</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <!-- Moment.js (optional, for date formatting) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <!-- TUI Calendar JS (if needed) -->
+    <script src="https://cdn.jsdelivr.net/npm/tui-calendar@1.15.3/dist/tui-calendar.min.js"></script>
+    <!-- Custom Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Settings Data from localStorage or use default data
+            const defaultSettings = {
+                username: "admin",
+                email: "admin@example.com",
+                profileImage: "" // Empty string indicates no image uploaded yet
+            };
+
+            const defaultPassword = "password123"; // Default password (for demonstration purposes only)
+
+            // Retrieve settings data from localStorage
+            let settingsData = JSON.parse(localStorage.getItem('adminSettings')) || defaultSettings;
+            let passwordData = localStorage.getItem('adminPassword') || defaultPassword;
+
+            // Populate Profile Settings Form with existing data
+            document.getElementById('username').value = settingsData.username;
+            document.getElementById('email').value = settingsData.email;
+
+            if (settingsData.profileImage) {
+                const profileImagePreview = document.getElementById('profileImagePreview');
+                profileImagePreview.src = settingsData.profileImage;
+                profileImagePreview.style.display = 'block';
+            }
+
+            // Handle Profile Image Upload Preview
+            document.getElementById('profileImage').addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const profileImagePreview = document.getElementById('profileImagePreview');
+                        profileImagePreview.src = e.target.result;
+                        profileImagePreview.style.display = 'block';
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Handle Profile Settings Form Submission
+            document.getElementById('profileSettingsForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const username = document.getElementById('username').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const profileImageInput = document.getElementById('profileImage');
+                const profileImagePreview = document.getElementById('profileImagePreview');
+
+                // Validate inputs
+                if (!username || !email) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+
+                // Update settings data
+                settingsData.username = username;
+                settingsData.email = email;
+
+                if (profileImageInput.files[0]) {
+                    settingsData.profileImage = profileImagePreview.src;
+                }
+
+                // Save to localStorage
+                localStorage.setItem('adminSettings', JSON.stringify(settingsData));
+
+                // Provide feedback to user
+                alert('Profile settings updated successfully.');
+            });
+
+            // Handle Password Settings Form Submission
+            document.getElementById('passwordSettingsForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const currentPassword = document.getElementById('currentPassword').value.trim();
+                const newPassword = document.getElementById('newPassword').value.trim();
+                const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+                // Validate inputs
+                if (!currentPassword || !newPassword || !confirmPassword) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+
+                // Check if current password matches
+                if (currentPassword !== passwordData) {
+                    alert('Current password is incorrect.');
+                    return;
+                }
+
+                // Check if new passwords match
+                if (newPassword !== confirmPassword) {
+                    alert('New passwords do not match.');
+                    return;
+                }
+
+                // Update password data
+                passwordData = newPassword;
+
+                // Save to localStorage
+                localStorage.setItem('adminPassword', passwordData);
+
+                // Provide feedback to user
+                alert('Password changed successfully.');
+
+                // Clear form fields
+                document.getElementById('passwordSettingsForm').reset();
+            });
+        });
+
+        // Define functions globally to ensure accessibility from the navbar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const contentWrapper = document.getElementById('page-content-wrapper');
+            sidebar.classList.toggle('collapsed');
+            contentWrapper.classList.toggle('expanded');
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Events</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+    <style>
+        /* General Styles */
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f9fc; color: #1B4965; transition: background-color 0.3s, color 0.3s; overflow-x: hidden; }
+        .dark-mode { background-color: #121212; color: #e0e0e0; }
+        
+        /* Sidebar */
+        .sidebar { background-color: #5FA8D3; color: #CAE9FF; min-width: 220px; height: 100vh; position: fixed; top: 0; left: 0; padding-top: 70px; transition: transform 0.3s ease, background-color 0.3s; z-index: 1000; }
+        .sidebar.collapsed { transform: translateX(-100%); }
+        .sidebar ul { list-style: none; padding: 0; margin: 0; }
+        .sidebar ul li { padding: 0.8rem 1.5rem; display: flex; align-items: center; transition: background-color 0.2s; }
+        .sidebar ul li:hover { background-color: rgba(255, 255, 255, 0.2); }
+        .sidebar ul li a { color: #CAE9FF; text-decoration: none; font-weight: 500; margin-left: 10px; display: inline-block; }
+        .dark-mode .sidebar { background-color: #333; color: #f0f0f0; }
+        .dark-mode .sidebar ul li a { color: #e0e0e0; }
+        
+        /* Top Navbar */
+        .top-navbar { background-color: #1B4965; color: white; padding: 1rem; position: sticky; top: 0; z-index: 1001; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); }
+        .navbar-brand { font-weight: 500; font-size: 1.2rem; }
+        .dark-mode .top-navbar { background-color: #333; }
+        .toggle-btn { font-size: 1.5rem; cursor: pointer; color: #CAE9FF; display: flex; align-items: center; }
+        
+        /* Main Content Wrapper */
+        #page-content-wrapper { flex: 1; padding: 2rem; margin-left: 220px; transition: margin-left 0.3s ease; }
+        #page-content-wrapper.expanded { margin-left: 0; }
+        
+        /* Card */
+        .card { border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); transition: background-color 0.3s, color 0.3s; }
+        .dark-mode .card { background-color: #333; color: #e0e0e0; }
+        
+        /* Modal */
+        .modal-content { transition: background-color 0.3s, color 0.3s; }
+        .dark-mode .modal-content { background-color: #333; color: #e0e0e0; }
+        .dark-mode .modal-header, .dark-mode .modal-footer { border-color: #555; }
+        .modal-body .event-date { font-weight: bold; color: #1B4965; }
+        .dark-mode .modal-body .event-date { color: #66D9EF; }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) { 
+            .sidebar { transform: translateX(-100%); position: absolute; } 
+            .sidebar.collapsed { transform: translateX(0); } 
+            #page-content-wrapper { margin-left: 0; padding: 1rem; }
+            .top-navbar .navbar-brand { font-size: 1rem; }
+        }
+        @media (max-width: 576px) { 
+            #page-content-wrapper { padding: 0.8rem; }
+            .top-navbar { padding: 0.8rem; } 
+            .navbar-brand, .top-navbar span { font-size: 0.85rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navbar -->
+    <div class="top-navbar">
+        <div class="d-flex align-items-center">
+            <span class="toggle-btn me-3" onclick="toggleSidebar()" aria-label="Toggle sidebar">☰</span>
+            <div class="navbar-brand">User Dashboard</div>
+        </div>
+        <div class="d-flex align-items-center">
+            <i class="bi bi-moon-fill me-3" onclick="toggleDarkMode()" style="cursor: pointer;" aria-label="Toggle dark mode"></i>
+            <span>User Name</span>
+        </div>
+    </div>
+
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar">
+            <ul>
+                <li><i class="bi bi-house-door-fill"></i><a href="user_home.html">Home</a></li>
+                <li><i class="bi bi-calendar-event-fill"></i><a href="user_events.html">Events</a></li>
+                <li><i class="bi bi-calendar-fill"></i><a href="user_calendar.html">Calendar</a></li>
+                <li><i class="bi bi-person-fill"></i><a href="user_profile.html">Profile</a></li>
+                <li><i class="bi bi-gear-fill"></i><a href="user_settings.html">Settings</a></li>
+                <li class="logout"><i class="bi bi-box-arrow-right"></i><a href="logout.html">Log Out</a></li>
+            </ul>
+        </div>
+
+        <!-- Page Content Wrapper -->
+        <div id="page-content-wrapper">
+            <h2>My Events</h2>
+            <p>Here are the events you're registered for and upcoming events you may like.</p>
+
+            <!-- Registered Events -->
+            <h4>Registered Events</h4>
+            <div class="row">
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card">
+                        <img src="assets/img/art-workshop.jpg" class="card-img-top" alt="Event Image">
+                        <div class="card-body">
+                            <h5 class="card-title">Tech Conference 2023</h5>
+                            <p class="card-text">Join industry leaders for a day of innovation and networking.</p>
+                            <p class="card-text"><span class="event-date">Date: October 15, 2023</span></p>
+                            <button class="btn btn-primary w-100" data-bs-toggle="modal" data-bs-target="#eventDetailsModal">View Details</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Not Registered Event -->
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card">
+                        <img src="assets/img/tech-conference.jpg" class="card-img-top" alt="Event Image">
+                        <div class="card-body">
+                            <h5 class="card-title">Art Workshop</h5>
+                            <p class="card-text">Explore your creativity in our art workshop.</p>
+                            <p class="card-text"><span class="event-date">Date: November 5, 2023</span></p>
+                            <button class="btn btn-success w-100" data-bs-toggle="modal" data-bs-target="#registerEventModal">Register</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Event Details Modal -->
+    <div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-labelledby="eventDetailsLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventDetailsLabel">Tech Conference 2023</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Date:</strong> <span class="event-date">October 15, 2023</span></p>
+                    <p>Join industry leaders for a day of innovation and networking.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Add to Calendar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Event Modal -->
+    <div class="modal fade" id="registerEventModal" tabindex="-1" aria-labelledby="registerEventLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerEventLabel">Register for Art Workshop</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Date:</strong> <span class="event-date">November 5, 2023</span></p>
+                    <form>
+                        <div class="mb-3">
+                            <label for="userName" class="form-label">Full Name</label>
+                            <input type="text" class="form-control" id="userName" value="User Name" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userEmail" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="userEmail" value="user@example.com" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userContact" class="form-label">Contact Number</label>
+                            <input type="tel" class="form-control" id="userContact" value="123-456-7890" readonly>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Confirm Registration</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const contentWrapper = document.getElementById('page-content-wrapper');
+            sidebar.classList.toggle('collapsed');
+            contentWrapper.classList.toggle('expanded');
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+        }
+    </script>
+</body>
+</html>

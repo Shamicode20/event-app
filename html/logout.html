@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logout - Admin Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+    <style>
+        /* General Styles */
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f9fc; color: #1B4965; }
+        .dark-mode { background-color: #121212; color: #e0e0e0; }
+
+        /* Centered Container */
+        .center-container { 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center;
+        }
+        
+        /* Card Style */
+        .card {
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .dark-mode .card {
+            background-color: #333; 
+            color: #e0e0e0;
+        }
+    </style>
+</head>
+<body class="dark-mode">
+
+    <!-- Logout Confirmation -->
+    <div class="center-container">
+        <div class="card p-5">
+            <h2>Log Out</h2>
+            <p>Are you sure you want to log out of the Admin Dashboard?</p>
+            <div class="d-flex justify-content-center mt-4">
+                <!-- Cancel button links back to the dashboard (home.html) -->
+                <a href="home.html" class="btn btn-secondary me-3">Cancel</a>
+                <!-- Confirm logout button would typically trigger a logout action -->
+                <a href="login.html" class="btn btn-danger">Log Out</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

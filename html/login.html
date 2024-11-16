@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Google Fonts (Poppins) -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #f4f9fc;
+      color: #1b4965;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+
+    .container {
+      display: flex;
+      width: 100%;
+      max-width: 1000px;
+      height: 70vh;
+      overflow: hidden;
+      border-radius: 40px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .left {
+      flex: 1;
+      background-color: #5fa8d3;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-top-left-radius: 40px;
+      border-bottom-left-radius: 40px;
+    }
+
+    .left img {
+      max-width: 450px;
+      width: 90%;
+      border-radius: 20px;
+    }
+
+    .right {
+      flex: 1;
+      background-color: white;
+      padding: 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-top-right-radius: 40px;
+      border-bottom-right-radius: 40px;
+    }
+
+    .right .card-header {
+      color: #5fa8d3;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      text-align: left;
+      margin-left: 3.5rem;
+    }
+
+    .form-control {
+      font-size: 0.9rem;
+      padding: 10px;
+      width: 80%;
+      margin-bottom: 1rem;
+      margin-left: 10%;
+    }
+
+    .btn-primary {
+      background-color: #1b4965;
+      border-color: #1b4965;
+      padding: 12px 20px;
+      font-size: 1rem;
+      width: 80%;
+      margin: 0 auto;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      background-color: #143a50;
+      border-color: #143a50;
+    }
+
+    /* Responsive Design for smaller screens */
+    @media (max-width: 1024px) {
+      .container {
+        height: auto;
+        flex-direction: column;
+      }
+
+      .left,
+      .right {
+        flex: none;
+        width: 100%;
+        border-radius: 0;
+      }
+
+      .left img {
+        width: 80%;
+        max-width: 400px;
+      }
+
+      .right {
+        padding: 2rem;
+      }
+
+      .right .card-header {
+        font-size: 1.25rem;
+      }
+
+      .form-label {
+        margin-left: 0;
+        text-align: center;
+      }
+
+      .form-control {
+        width: 90%;
+        margin-left: 5%;
+      }
+
+      .btn-primary {
+        width: 90%;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .left img {
+        width: 70%;
+        max-width: 350px;
+      }
+
+      .right {
+        padding: 1.5rem;
+      }
+
+      .right .card-header {
+        font-size: 1.1rem;
+      }
+
+      .form-control {
+        font-size: 0.8rem;
+      }
+
+      .btn-primary {
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .left img {
+        width: 60%;
+        max-width: 300px;
+      }
+
+      .right {
+        padding: 1rem;
+      }
+
+      .right .card-header {
+        font-size: 1rem;
+      }
+
+      .form-control {
+        font-size: 0.75rem;
+      }
+
+      .btn-primary {
+        font-size: 0.85rem;
+      }
+    }
+
+    /* Feedback Messages */
+    #feedback {
+      display: none;
+    }
+
+    #feedback.success {
+      display: block;
+      color: green;
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    #feedback.error {
+      display: block;
+      color: red;
+      text-align: center;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Left Column (Image/Logo) -->
+    <div class="left">
+      <img src="assets/img/logo.png" alt="LGU Logo" />
+    </div>
+
+    <!-- Right Column (Login Form) -->
+    <div class="right">
+      <div class="card-header">Login</div>
+      <form id="loginForm">
+        <div class="mb-3">
+          <label for="username" class="form-label">Username</label>
+          <input type="text" class="form-control" id="username" name="username" placeholder="Enter your username" required />
+        </div>
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required />
+        </div>
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary">Login</button>
+        </div>
+      </form>
+      <div id="feedback"></div>
+      <div class="text-center mt-3">
+        <small>Forgot your password? <a href="forgot_password.html" class="text-decoration-none">Reset it here</a>.</small><br />
+        <small>Don't have an account? <a href="register.html" class="text-decoration-none">Register here</a>.</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Optional Bootstrap JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+  <!-- Custom Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const loginForm = document.getElementById('loginForm');
+      const feedback = document.getElementById('feedback');
+
+      // Hardcoded credentials for demonstration purposes
+      const validCredentials = {
+        username: 'admin',
+        password: 'admin'
+      };
+
+      loginForm.addEventListener('submit', function (e) {
+        e.preventDefault(); // Prevent form from submitting normally
+
+        // Get user input
+        const enteredUsername = document.getElementById('username').value.trim();
+        const enteredPassword = document.getElementById('password').value.trim();
+
+        // Validate credentials
+        if (
+          enteredUsername === validCredentials.username &&
+          enteredPassword === validCredentials.password
+        ) {
+          // Set login state in localStorage
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('username', enteredUsername);
+
+          // Provide success feedback
+          feedback.className = 'success';
+          feedback.innerText = 'Login successful! Redirecting...';
+          feedback.style.display = 'block';
+
+          // Redirect to home.html after a short delay
+          setTimeout(() => {
+            window.location.href = 'home.html';
+          }, 1500);
+        } else {
+          // Provide error feedback
+          feedback.className = 'error';
+          feedback.innerText = 'Invalid username or password.';
+          feedback.style.display = 'block';
+        }
+      });
+
+      // Optional: Check if already logged in and redirect
+      if (localStorage.getItem('isLoggedIn') === 'true') {
+        window.location.href = 'home.html';
+      }
+    });
+  </script>
+</body>
+
+</html>

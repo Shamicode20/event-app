@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - Calendar</title>
+    <!-- Google Fonts (Poppins) -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.5.0/font/bootstrap-icons.min.css">
+    <!-- TUI Calendar CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tui-calendar@1.15.3/dist/tui-calendar.min.css" />
+    <!-- Custom Styles -->
+    <style>
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background-color: #f4f9fc; 
+            color: #1B4965; 
+            transition: background-color 0.3s, color 0.3s; 
+            overflow-x: hidden; 
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .dark-mode { 
+            background-color: #121212; 
+            color: #e0e0e0; 
+        }
+
+        /* Sidebar */
+        .sidebar { 
+            background-color: #5FA8D3; 
+            color: #CAE9FF; 
+            min-width: 220px; 
+            height: 100vh; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            padding-top: 70px; 
+            transition: transform 0.3s ease, background-color 0.3s; 
+            z-index: 1000; 
+            overflow-y: auto;
+        }
+        .sidebar.collapsed { 
+            transform: translateX(-100%); 
+        }
+        .sidebar ul { 
+            list-style: none; 
+            padding: 0; 
+            margin: 0; 
+        }
+        .sidebar ul li { 
+            padding: 0.8rem 1.5rem; 
+            display: flex; 
+            align-items: center; 
+            transition: background-color 0.2s; 
+        }
+        .sidebar ul li:hover { 
+            background-color: rgba(255, 255, 255, 0.2); 
+        }
+        .sidebar ul li a { 
+            color: #CAE9FF; 
+            text-decoration: none; 
+            font-weight: 500; 
+            margin-left: 10px; 
+            display: inline-block; 
+        }
+        .dark-mode .sidebar { 
+            background-color: #333; 
+            color: #f0f0f0; 
+        }
+        .dark-mode .sidebar ul li a { 
+            color: #e0e0e0; 
+        }
+
+        /* Top Navbar */
+        .top-navbar { 
+            background-color: #1B4965; 
+            color: white; 
+            padding: 1rem; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            z-index: 1001; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+        }
+        .navbar-brand { 
+            font-weight: 500; 
+            font-size: 1.2rem; 
+        }
+        .dark-mode .top-navbar { 
+            background-color: #333; 
+        }
+        .toggle-btn { 
+            font-size: 1.5rem; 
+            cursor: pointer; 
+            color: #CAE9FF; 
+            display: flex; 
+            align-items: center; 
+        }
+
+        /* Page Content Wrapper */
+        #page-content-wrapper { 
+            flex: 1; 
+            padding: 6rem 2rem 2rem 2rem; /* Adjust padding to account for fixed navbar */
+            margin-left: 220px; 
+            transition: margin-left 0.3s ease; 
+        }
+        #page-content-wrapper.expanded { 
+            margin-left: 0; 
+        }
+
+        /* Calendar Container */
+        #calendar {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 10px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            height: 800px; /* Ensure calendar is visible */
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) { 
+            .sidebar { 
+                transform: translateX(-100%); 
+                position: absolute; 
+            } 
+            .sidebar.collapsed { 
+                transform: translateX(0); 
+            } 
+            #page-content-wrapper { 
+                margin-left: 0; 
+                padding: 6rem 1rem 1rem 1rem; 
+            }
+            .top-navbar .navbar-brand { 
+                font-size: 1rem; 
+            }
+        }
+        @media (max-width: 576px) { 
+            #page-content-wrapper { 
+                padding: 6rem 0.8rem 0.8rem 0.8rem; 
+            }
+            .top-navbar { 
+                padding: 0.8rem; 
+            } 
+            .navbar-brand, .top-navbar span { 
+                font-size: 0.85rem; 
+            }
+        }
+
+        /* TUI Calendar Overrides for Dark Mode */
+        .dark-mode .tui-full-calendar-container {
+            background-color: #333;
+            color: #e0e0e0;
+        }
+        .dark-mode .tui-full-calendar-container .tui-full-calendar-daygrid-day-number {
+            color: #e0e0e0;
+        }
+        .dark-mode .tui-full-calendar-container .tui-full-calendar-schedule-container .tui-full-calendar-schedule {
+            background-color: #555;
+            color: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Navbar -->
+    <div class="top-navbar">
+        <div class="d-flex align-items-center">
+            <span class="toggle-btn me-3" onclick="toggleSidebar()" aria-label="Toggle sidebar">☰</span>
+            <div class="navbar-brand">User Dashboard</div>
+        </div>
+        <div class="d-flex align-items-center">
+            <i class="bi bi-moon-fill me-3" onclick="toggleDarkMode()" style="cursor: pointer;" aria-label="Toggle dark mode"></i>
+            <span>User Name</span>
+        </div>
+    </div>
+
+    <div id="wrapper" style="display: flex;">
+
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar">
+            <ul>
+                <li><i class="bi bi-house-door-fill"></i><a href="user_home.html">Home</a></li>
+                <li><i class="bi bi-calendar-event-fill"></i><a href="user_events.html">Events</a></li>
+                <li><i class="bi bi-calendar-fill"></i><a href="user_calendar.html">Calendar</a></li>
+                <li><i class="bi bi-person-fill"></i><a href="user_profile.html">Profile</a></li>
+                <li><i class="bi bi-gear-fill"></i><a href="user_settings.html">Settings</a></li>
+                <li class="logout"><i class="bi bi-box-arrow-right"></i><a href="logout.html">Log Out</a></li>
+            </ul>
+        </div>
+
+        <!-- Page Content Wrapper -->
+        <div id="page-content-wrapper">
+            <h2>My Calendar</h2>
+            <p>Here you can view and manage your events.</p>
+
+            <!-- Add Event Button -->
+            <button class="btn btn-primary mb-3" onclick="openAddEventModal()">Add Event</button>
+
+            <!-- Calendar -->
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <!-- Event Details Modal -->
+    <div class="modal fade" id="eventDetailsModal" tabindex="-1" aria-labelledby="eventDetailsLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventDetailsLabel">Event Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>Title:</strong> <span id="modalEventTitle"></span></p>
+                    <p><strong>Date:</strong> <span id="modalEventDate"></span></p>
+                    <p><strong>Description:</strong> <span id="modalEventDescription"></span></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Event Modal -->
+    <div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="addEventForm">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addEventLabel">Add New Event</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="eventTitle" class="form-label">Event Title</label>
+                            <input type="text" class="form-control" id="eventTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventDate" class="form-label">Event Date</label>
+                            <input type="date" class="form-control" id="eventDate" required>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="eventAllDay">
+                            <label class="form-check-label" for="eventAllDay">All Day Event</label>
+                        </div>
+                        <div class="mb-3">
+                            <label for="eventDescription" class="form-label">Event Description</label>
+                            <textarea class="form-control" id="eventDescription" rows="3" required></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Add Event</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and Dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <!-- Moment.js (optional, for date formatting) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <!-- TUI Calendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/tui-calendar@1.15.3/dist/tui-calendar.min.js"></script>
+    <!-- Custom Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+
+            // Initialize TUI Calendar and assign to window.calendar for global access
+            window.calendar = new tui.Calendar(calendarEl, {
+                defaultView: 'month',
+                taskView: false,
+                scheduleView: ['time', 'month'],
+                template: {
+                    time(schedule) {
+                        return `<span style="color: #ffffff;">${schedule.title}</span>`;
+                    }
+                },
+                theme: {
+                    // Customize the calendar's appearance
+                    common: {
+                        backgroundColor: 'white',
+                        borderColor: '#1B4965'
+                    },
+                    month: {
+                        daynames: {
+                            color: '#1B4965'
+                        },
+                        title: {
+                            color: '#1B4965',
+                            fontSize: '16px'
+                        },
+                        gridSelection: {
+                            backgroundColor: 'rgba(27, 73, 101, 0.2)'
+                        }
+                    },
+                    time: {
+                        title: {
+                            color: '#1B4965',
+                            fontSize: '16px'
+                        },
+                        week: {
+                            schedule: {
+                                borderColor: '#1B4965',
+                                backgroundColor: '#1B4965',
+                                color: '#ffffff'
+                            }
+                        },
+                        day: {
+                            schedule: {
+                                borderColor: '#1B4965',
+                                backgroundColor: '#1B4965',
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Define calendars (required by TUI Calendar)
+            calendar.createCalendars([
+                {
+                    id: '1',
+                    name: 'Default',
+                    color: '#1B4965',
+                    bgColor: '#1B4965',
+                    dragBgColor: '#1B4965',
+                    borderColor: '#1B4965'
+                }
+            ]);
+
+            // Retrieve events from Local Storage or initialize with example events
+            let storedEvents = JSON.parse(localStorage.getItem('calendarEvents')) || [
+                {
+                    id: '1',
+                    calendarId: '1',
+                    title: 'Tech Conference 2024',
+                    category: 'time',
+                    dueDateClass: '',
+                    start: '2024-11-20T10:30:00+09:00',
+                    end: '2024-11-20T12:30:00+09:00',
+                    isAllDay: false,
+                    raw: {
+                        description: 'Join industry leaders for a day of innovation and networking.'
+                    }
+                },
+                {
+                    id: '2',
+                    calendarId: '1',
+                    title: 'Art Workshop',
+                    category: 'time',
+                    dueDateClass: '',
+                    start: '2024-12-05T14:00:00+09:00',
+                    end: '2024-12-05T16:00:00+09:00',
+                    isAllDay: false,
+                    raw: {
+                        description: 'Explore your creativity in our art workshop.'
+                    }
+                },
+                {
+                    id: '3',
+                    calendarId: '1',
+                    title: 'All-Day Retreat',
+                    category: 'allday',
+                    dueDateClass: '',
+                    start: '2024-12-10',
+                    end: '2024-12-10',
+                    isAllDay: true,
+                    raw: {
+                        description: 'An all-day retreat for relaxation and team building.'
+                    }
+                },
+                {
+                    id: '4',
+                    calendarId: '1',
+                    title: 'Project Deadline',
+                    category: 'allday',
+                    dueDateClass: '',
+                    start: '2024-12-20',
+                    end: '2024-12-20',
+                    isAllDay: true,
+                    raw: {
+                        description: 'Final deadline for the current project phase.'
+                    }
+                },
+                {
+                    id: '5',
+                    calendarId: '1',
+                    title: 'New Year Celebration',
+                    category: 'allday',
+                    dueDateClass: '',
+                    start: '2025-01-01',
+                    end: '2025-01-01',
+                    isAllDay: true,
+                    raw: {
+                        description: 'Celebrate the New Year with the team!'
+                    }
+                },
+                {
+                    id: '6',
+                    calendarId: '1',
+                    title: 'Team Building Activity',
+                    category: 'time',
+                    dueDateClass: '',
+                    start: '2024-11-25T09:00:00+09:00',
+                    end: '2024-11-25T17:00:00+09:00',
+                    isAllDay: false,
+                    raw: {
+                        description: 'Engage in fun activities to strengthen team bonds.'
+                    }
+                }
+            ];
+
+            // Add events to the calendar
+            storedEvents.forEach(function(event) {
+                calendar.createSchedules([{
+                    id: event.id,
+                    calendarId: event.calendarId,
+                    title: event.title,
+                    category: event.category,
+                    dueDateClass: event.dueDateClass,
+                    start: event.start,
+                    end: event.end,
+                    isAllDay: event.isAllDay,
+                    raw: event.raw
+                }]);
+            });
+
+            // Handle Event Click
+            calendar.on('clickSchedule', function(e) {
+                var schedule = e.schedule;
+
+                document.getElementById('modalEventTitle').innerText = schedule.title;
+                document.getElementById('modalEventDate').innerText = schedule.isAllDay 
+                    ? moment(schedule.start).format('MMMM Do YYYY') + ' (All Day)' 
+                    : moment(schedule.start).format('MMMM Do YYYY, h:mm a') + ' - ' + moment(schedule.end).format('h:mm a');
+                document.getElementById('modalEventDescription').innerText = schedule.raw.description || 'No description provided.';
+
+                var eventDetailsModal = new bootstrap.Modal(document.getElementById('eventDetailsModal'));
+                eventDetailsModal.show();
+            });
+
+            // Handle Add Event Modal Submission
+            document.getElementById('addEventForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                var title = document.getElementById('eventTitle').value.trim();
+                var date = document.getElementById('eventDate').value;
+                var description = document.getElementById('eventDescription').value.trim();
+                var isAllDay = document.getElementById('eventAllDay').checked;
+
+                if(title && date) {
+                    // Generate a unique ID for the new event
+                    var newId = Date.now().toString();
+
+                    // Create a new event object based on whether it's all-day
+                    var newEvent = {
+                        id: newId,
+                        calendarId: '1',
+                        title: title,
+                        category: isAllDay ? 'allday' : 'time',
+                        dueDateClass: '',
+                        start: isAllDay ? date : date + 'T09:00:00+09:00',
+                        end: isAllDay ? date : date + 'T11:00:00+09:00',
+                        isAllDay: isAllDay,
+                        raw: {
+                            description: description
+                        }
+                    };
+
+                    // Add the event to the calendar
+                    calendar.createSchedules([newEvent]);
+
+                    // Add the event to the storedEvents array
+                    storedEvents.push(newEvent);
+
+                    // Save the updated events to Local Storage
+                    localStorage.setItem('calendarEvents', JSON.stringify(storedEvents));
+
+                    // Hide the modal
+                    var addEventModalInstance = bootstrap.Modal.getInstance(document.getElementById('addEventModal'));
+                    addEventModalInstance.hide();
+
+                    // Reset the form
+                    this.reset();
+                } else {
+                    alert('Please provide both a title and a date for the event.');
+                }
+            });
+        });
+
+        // Define functions globally to ensure accessibility from the navbar
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const contentWrapper = document.getElementById('page-content-wrapper');
+            sidebar.classList.toggle('collapsed');
+            contentWrapper.classList.toggle('expanded');
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            // Re-render the calendar to apply dark mode styles
+            setTimeout(() => {
+                if (window.calendar) {
+                    window.calendar.render();
+                }
+            }, 300); // Delay to allow CSS transition
+        }
+
+        // Function to open the Add Event Modal
+        function openAddEventModal() {
+            var addEventModal = new bootstrap.Modal(document.getElementById('addEventModal'));
+            addEventModal.show();
+        }
+    </script>
+</body>
+</html>
