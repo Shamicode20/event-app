@@ -12,20 +12,22 @@
       font-family: "Poppins", sans-serif;
       background-color: #f4f9fc;
       color: #1b4965;
-      height: 100vh;
+      margin: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      margin: 0;
+      min-height: 100vh;
+      padding: 1rem;
     }
 
     .container {
       display: flex;
+      flex-direction: row;
       width: 100%;
       max-width: 1000px;
-      height: 70vh;
+      border-radius: 20px;
       overflow: hidden;
-      border-radius: 40px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     }
 
     .left {
@@ -34,28 +36,25 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      border-top-left-radius: 40px;
-      border-bottom-left-radius: 40px;
+      padding: 1rem;
     }
 
     .left img {
-      max-width: 450px;
-      width: 90%;
-      border-radius: 20px;
+      max-width: 100%;
+      height: auto;
+      border-radius: 10px;
     }
 
     .right {
       flex: 1;
       background-color: white;
-      padding: 3rem;
+      padding: 2rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      border-top-right-radius: 40px;
-      border-bottom-right-radius: 40px;
     }
 
-    .right .card-header {
+    .card-header {
       color: #5fa8d3;
       text-align: center;
       font-size: 1.5rem;
@@ -66,25 +65,19 @@
     .form-label {
       display: block;
       margin-bottom: 0.5rem;
-      text-align: left;
-      margin-left: 3.5rem;
     }
 
     .form-control {
-      font-size: 0.9rem;
+      font-size: 1rem;
       padding: 10px;
-      width: 80%;
       margin-bottom: 1rem;
-      margin-left: 10%;
     }
 
     .btn-primary {
       background-color: #1b4965;
       border-color: #1b4965;
-      padding: 12px 20px;
+      padding: 10px 20px;
       font-size: 1rem;
-      width: 80%;
-      margin: 0 auto;
     }
 
     .btn-primary:hover {
@@ -105,6 +98,48 @@
     #feedback.error {
       color: red;
       text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        height: auto;
+      }
+
+      .left, .right {
+        width: 100%;
+        padding: 1rem;
+      }
+
+      .card-header {
+        font-size: 1.25rem;
+      }
+
+      .form-control {
+        font-size: 0.9rem;
+      }
+
+      .btn-primary {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 1rem;
+      }
+
+      .card-header {
+        font-size: 1.1rem;
+      }
+
+      .form-control {
+        font-size: 0.85rem;
+      }
+
+      .btn-primary {
+        font-size: 0.9rem;
+      }
     }
   </style>
 </head>
@@ -147,7 +182,6 @@
     </div>
   </div>
 
-  <!-- Bootstrap JS -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -157,7 +191,6 @@
       registerForm.addEventListener("submit", async function(e) {
         e.preventDefault();
 
-        // Validate passwords match
         const password = document.getElementById("password").value.trim();
         const confirmPassword = document.getElementById("confirmPassword").value.trim();
 
@@ -168,7 +201,6 @@
           return;
         }
 
-        // Submit form data to the backend
         const formData = new FormData(registerForm);
         formData.append("action", "register");
 
@@ -185,7 +217,6 @@
             feedback.textContent = "Registration successful! Redirecting...";
             feedback.style.display = "block";
 
-            // Redirect to login page
             setTimeout(() => {
               window.location.href = "login.php";
             }, 1500);
