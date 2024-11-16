@@ -25,7 +25,6 @@ function fetchCount($conn, $tableName)
         $data = $stmt->fetch(PDO::FETCH_ASSOC);
         return $data['count'] ?? 0;
     } catch (Exception $e) {
-        // Log the error for debugging purposes
         error_log("Error fetching count from $tableName: " . $e->getMessage());
         return 0;
     }
@@ -68,7 +67,136 @@ $totalParticipants = fetchCount($conn, 'event_participants');
                 </div>
             </div>
         </div>
+
+        <div class="row mt-4">
+            <!-- Highcharts Container -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>Analytics: Total Users, Events, and Participants</h5>
+                        <div id="analyticsChart"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <?php include '../../includes/footer.php'; ?>
+
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Detect if the system prefers dark mode
+        const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        const chartOptions = {
+            chart: {
+                type: 'column',
+                backgroundColor: isDarkMode ? '#1c1e21' : '#ffffff', // Dynamic background
+                style: {
+                    fontFamily: 'Arial, sans-serif'
+                }
+            },
+            title: {
+                text: 'Analytics Overview',
+                style: {
+                    color: isDarkMode ? '#ffffff' : '#333333' // Dynamic title color
+                }
+            },
+            xAxis: {
+                categories: ['Total Users', 'Total Events', 'Total Participants'],
+                title: {
+                    text: 'Metrics',
+                    style: {
+                        color: isDarkMode ? '#ffffff' : '#333333' // Dynamic axis title color
+                    }
+                },
+                labels: {
+                    style: {
+                        color: isDarkMode ? '#ffffff' : '#333333' // Dynamic label color
+                    }
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Count',
+                    style: {
+                        color: isDarkMode ? '#ffffff' : '#333333' // Dynamic axis title color
+                    }
+                },
+                labels: {
+                    style: {
+                        color: isDarkMode ? '#ffffff' : '#333333' // Dynamic label color
+                    }
+                },
+                gridLineColor: isDarkMode ? '#555555' : '#e6e6e6' // Grid line color for better contrast
+            },
+            tooltip: {
+                backgroundColor: isDarkMode ? '#333333' : '#ffffff', // Dynamic tooltip background
+                style: {
+                    color: isDarkMode ? '#ffffff' : '#333333' // Dynamic tooltip text color
+                },
+                borderColor: isDarkMode ? '#555555' : '#dddddd' // Dynamic tooltip border
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            exporting: {
+                buttons: {
+                    contextButton: {
+                        menuItems: [
+                            'downloadPNG',
+                            'downloadJPEG',
+                            'downloadPDF',
+                            'downloadCSV',
+                            'downloadXLS',
+                            'viewData'
+                        ]
+                    }
+                }
+            },
+            credits: {
+                enabled: false // Disable Highcharts credits
+            },
+            series: [{
+                name: 'Counts',
+                data: [
+                    <?php echo htmlspecialchars($totalUsers); ?>,
+                    <?php echo htmlspecialchars($totalEvents); ?>,
+                    <?php echo htmlspecialchars($totalParticipants); ?>
+                ],
+                color: isDarkMode ? '#00aaff' : '#007bff' // Dynamic column color
+            }]
+        };
+
+        // Initialize the chart
+        Highcharts.chart('analyticsChart', chartOptions);
+
+        // Listen for changes to the system's color scheme
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+            chartOptions.chart.backgroundColor = e.matches ? '#1c1e21' : '#ffffff';
+            chartOptions.title.style.color = e.matches ? '#ffffff' : '#333333';
+            chartOptions.xAxis.title.style.color = e.matches ? '#ffffff' : '#333333';
+            chartOptions.xAxis.labels.style.color = e.matches ? '#ffffff' : '#333333';
+            chartOptions.yAxis.title.style.color = e.matches ? '#ffffff' : '#333333';
+            chartOptions.yAxis.labels.style.color = e.matches ? '#ffffff' : '#333333';
+            chartOptions.yAxis.gridLineColor = e.matches ? '#555555' : '#e6e6e6';
+            chartOptions.tooltip.backgroundColor = e.matches ? '#333333' : '#ffffff';
+            chartOptions.tooltip.style.color = e.matches ? '#ffffff' : '#333333';
+            chartOptions.tooltip.borderColor = e.matches ? '#555555' : '#dddddd';
+            chartOptions.series[0].color = e.matches ? '#00aaff' : '#007bff';
+
+            // Re-render the chart
+            Highcharts.chart('analyticsChart', chartOptions);
+        });
+    });
+</script>
