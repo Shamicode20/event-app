@@ -1,10 +1,20 @@
+<?php
+// Ensure the token is available
+if (!isset($_GET['token']) || empty($_GET['token'])) {
+    die('<h3 style="color:red; text-align:center;">Invalid or expired reset token. Please try again.</h3>');
+}
+
+// Sanitize the token input
+$token = htmlspecialchars($_GET['token'], ENT_QUOTES, 'UTF-8');
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Login</title>
+    <title>Reset Password</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet" />
     <style>
@@ -12,7 +22,7 @@
             font-family: "Poppins", sans-serif;
             background-color: #f4f9fc;
             color: #1b4965;
-            min-height: 100vh;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -60,40 +70,18 @@
             margin-bottom: 1rem;
         }
 
-        .form-label {
-            font-weight: 500;
-        }
-
-        .form-control {
-            border-radius: 50px;
-            padding: 0.8rem 1.5rem;
-        }
-
         .btn-primary {
             background-color: #1b4965;
             border-color: #1b4965;
-            padding: 0.8rem;
-            border-radius: 50px;
+            padding: 10px 20px;
             font-size: 1rem;
+            width: 100%;
+            border-radius: 50px;
         }
 
         .btn-primary:hover {
             background-color: #143a50;
             border-color: #143a50;
-        }
-
-        #feedback {
-            display: none;
-            margin-top: 1rem;
-            text-align: center;
-        }
-
-        #feedback.success {
-            color: green;
-        }
-
-        #feedback.error {
-            color: red;
         }
 
         @media (max-width: 768px) {
@@ -119,15 +107,16 @@
             <img src="assets/img/logo.png" alt="LGU Logo" />
         </div>
         <div class="right">
-            <div class="card-header">Login</div>
-            <form id="loginForm">
+            <div class="card-header">Reset Password</div>
+            <form id="resetPasswordForm">
+                <input type="hidden" name="token" id="token" value="<?php echo $token; ?>" />
                 <div class="mb-3">
-                    <label for="email" class="form-label">Email Address</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required />
+                    <label for="newPassword" class="form-label">New Password</label>
+                    <input type="password" class="form-control" id="newPassword" name="new_password" placeholder="Enter your new password" required />
                 </div>
                 <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required />
+                    <label for="confirmPassword" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your new password" required />
                 </div>
                 <div class="mb-3 form-check">
                     <input type="checkbox" class="form-check-input" id="showPassword" />
@@ -135,27 +124,35 @@
                 </div>
                 <div id="feedback"></div>
                 <div class="d-grid">
-                    <button type="submit" class="btn btn-primary">Login</button>
+                    <button type="submit" class="btn btn-primary">Reset Password</button>
                 </div>
             </form>
-            <div class="text-center mt-3">
-                <small>Forgot your password? <a href="forgot_password.php" class="text-decoration-none">Reset it here</a>.</small><br />
-                <small>Don't have an account? <a href="register.php" class="text-decoration-none">Register here</a>.</small>
-            </div>
         </div>
     </div>
     <script>
         document.getElementById("showPassword").addEventListener("change", function() {
-            const passwordField = document.getElementById("password");
+            const newPasswordField = document.getElementById("newPassword");
+            const confirmPasswordField = document.getElementById("confirmPassword");
             const type = this.checked ? "text" : "password";
-            passwordField.type = type;
+            newPasswordField.type = type;
+            confirmPasswordField.type = type;
         });
 
-        document.getElementById("loginForm").addEventListener("submit", async function(e) {
+        document.getElementById("resetPasswordForm").addEventListener("submit", async function(e) {
             e.preventDefault();
             const feedback = document.getElementById("feedback");
+            const newPassword = document.getElementById("newPassword").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+
+            if (newPassword !== confirmPassword) {
+                feedback.className = "error";
+                feedback.textContent = "Passwords do not match.";
+                feedback.style.display = "block";
+                return;
+            }
+
             const formData = new FormData(this);
-            formData.append("action", "login");
+            formData.append("action", "reset_password");
 
             try {
                 const response = await fetch("api/auth.php", {
@@ -164,15 +161,14 @@
                 });
 
                 const data = await response.json();
-
                 if (response.ok) {
                     feedback.className = "success";
-                    feedback.textContent = "Login successful! Redirecting...";
+                    feedback.textContent = "Password reset successful! Redirecting to login...";
                     feedback.style.display = "block";
-                    setTimeout(() => window.location.href = "index.php", 1500);
+                    setTimeout(() => window.location.href = "login.php", 1500);
                 } else {
                     feedback.className = "error";
-                    feedback.textContent = data.message || "Login failed.";
+                    feedback.textContent = data.message || "Failed to reset password.";
                     feedback.style.display = "block";
                 }
             } catch {

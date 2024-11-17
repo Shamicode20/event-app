@@ -27,7 +27,8 @@
       max-width: 1000px;
       border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      background-color: #ffffff;
     }
 
     .left {
@@ -36,47 +37,45 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 1rem;
+      padding: 2rem;
     }
 
     .left img {
-      max-width: 100%;
+      max-width: 80%;
       height: auto;
       border-radius: 10px;
     }
 
     .right {
       flex: 1;
-      background-color: white;
-      padding: 2rem;
+      padding: 3rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
     }
 
     .card-header {
-      color: #5fa8d3;
       text-align: center;
-      font-size: 1.5rem;
+      color: #1b4965;
+      font-size: 1.75rem;
       font-weight: 600;
       margin-bottom: 1rem;
     }
 
     .form-label {
-      display: block;
-      margin-bottom: 0.5rem;
+      font-weight: 500;
     }
 
     .form-control {
-      font-size: 1rem;
-      padding: 10px;
-      margin-bottom: 1rem;
+      border-radius: 50px;
+      padding: 0.8rem 1.5rem;
     }
 
     .btn-primary {
       background-color: #1b4965;
       border-color: #1b4965;
-      padding: 10px 20px;
+      padding: 0.8rem;
+      border-radius: 50px;
       font-size: 1rem;
     }
 
@@ -88,57 +87,29 @@
     #feedback {
       display: none;
       margin-top: 1rem;
+      text-align: center;
     }
 
     #feedback.success {
       color: green;
-      text-align: center;
     }
 
     #feedback.error {
       color: red;
-      text-align: center;
     }
 
     @media (max-width: 768px) {
       .container {
         flex-direction: column;
-        height: auto;
+        max-width: 100%;
       }
 
-      .left, .right {
-        width: 100%;
-        padding: 1rem;
+      .left {
+        display: none;
       }
 
-      .card-header {
-        font-size: 1.25rem;
-      }
-
-      .form-control {
-        font-size: 0.9rem;
-      }
-
-      .btn-primary {
-        width: 100%;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .container {
-        padding: 1rem;
-      }
-
-      .card-header {
-        font-size: 1.1rem;
-      }
-
-      .form-control {
-        font-size: 0.85rem;
-      }
-
-      .btn-primary {
-        font-size: 0.9rem;
+      .right {
+        padding: 2rem;
       }
     }
   </style>
@@ -146,21 +117,18 @@
 
 <body>
   <div class="container">
-    <!-- Left Column (Image/Logo) -->
     <div class="left">
       <img src="assets/img/logo.png" alt="LGU Logo" />
     </div>
-
-    <!-- Right Column (Registration Form) -->
     <div class="right">
-      <div class="card-header">Registration</div>
+      <div class="card-header">Create an Account</div>
       <form id="registerForm">
         <div class="mb-3">
           <label for="username" class="form-label">Full Name</label>
           <input type="text" class="form-control" id="username" name="name" placeholder="Enter your full name" required />
         </div>
         <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
+          <label for="email" class="form-label">Email Address</label>
           <input type="email" class="form-control" id="email" name="email" placeholder="Enter your email" required />
         </div>
         <div class="mb-3">
@@ -170,6 +138,10 @@
         <div class="mb-3">
           <label for="confirmPassword" class="form-label">Confirm Password</label>
           <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm your password" required />
+        </div>
+        <div class="mb-3 form-check">
+          <input type="checkbox" class="form-check-input" id="showPassword" />
+          <label class="form-check-label" for="showPassword">Show Password</label>
         </div>
         <div id="feedback"></div>
         <div class="d-grid">
@@ -181,56 +153,53 @@
       </div>
     </div>
   </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const registerForm = document.getElementById("registerForm");
+    document.getElementById("showPassword").addEventListener("change", function() {
+      const passwordField = document.getElementById("password");
+      const confirmPasswordField = document.getElementById("confirmPassword");
+      const type = this.checked ? "text" : "password";
+      passwordField.type = type;
+      confirmPasswordField.type = type;
+    });
+
+    document.getElementById("registerForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
       const feedback = document.getElementById("feedback");
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
 
-      registerForm.addEventListener("submit", async function(e) {
-        e.preventDefault();
+      if (password !== confirmPassword) {
+        feedback.className = "error";
+        feedback.textContent = "Passwords do not match.";
+        feedback.style.display = "block";
+        return;
+      }
 
-        const password = document.getElementById("password").value.trim();
-        const confirmPassword = document.getElementById("confirmPassword").value.trim();
+      const formData = new FormData(this);
+      formData.append("action", "register");
 
-        if (password !== confirmPassword) {
-          feedback.className = "error";
-          feedback.textContent = "Passwords do not match.";
+      try {
+        const response = await fetch("api/auth.php", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await response.json();
+        if (response.ok) {
+          feedback.className = "success";
+          feedback.textContent = "Registration successful! Redirecting...";
           feedback.style.display = "block";
-          return;
-        }
-
-        const formData = new FormData(registerForm);
-        formData.append("action", "register");
-
-        try {
-          const response = await fetch("api/auth.php", {
-            method: "POST",
-            body: formData,
-          });
-
-          const data = await response.json();
-
-          if (response.ok) {
-            feedback.className = "success";
-            feedback.textContent = "Registration successful! Redirecting...";
-            feedback.style.display = "block";
-
-            setTimeout(() => {
-              window.location.href = "login.php";
-            }, 1500);
-          } else {
-            feedback.className = "error";
-            feedback.textContent = data.message || "Registration failed. Please try again.";
-            feedback.style.display = "block";
-          }
-        } catch (error) {
+          setTimeout(() => (window.location.href = "login.php"), 1500);
+        } else {
           feedback.className = "error";
-          feedback.textContent = "An error occurred. Please try again.";
+          feedback.textContent = data.message || "Registration failed.";
           feedback.style.display = "block";
         }
-      });
+      } catch {
+        feedback.className = "error";
+        feedback.textContent = "An error occurred.";
+        feedback.style.display = "block";
+      }
     });
   </script>
 </body>

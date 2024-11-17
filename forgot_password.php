@@ -12,20 +12,22 @@
       font-family: "Poppins", sans-serif;
       background-color: #f4f9fc;
       color: #1b4965;
-      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      height: 100vh;
       margin: 0;
     }
 
     .container {
       display: flex;
+      flex-direction: row;
       width: 100%;
       max-width: 1000px;
-      height: 70vh;
+      border-radius: 20px;
       overflow: hidden;
-      border-radius: 40px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      background-color: #ffffff;
     }
 
     .left {
@@ -34,57 +36,37 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      border-top-left-radius: 40px;
-      border-bottom-left-radius: 40px;
+      padding: 2rem;
     }
 
     .left img {
-      max-width: 450px;
-      width: 90%;
-      border-radius: 20px;
+      max-width: 80%;
+      height: auto;
     }
 
     .right {
       flex: 1;
-      background-color: white;
       padding: 3rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      border-top-right-radius: 40px;
-      border-bottom-right-radius: 40px;
     }
 
-    .right .card-header {
-      color: #5fa8d3;
+    .card-header {
       text-align: center;
-      font-size: 1.5rem;
+      color: #1b4965;
+      font-size: 1.75rem;
       font-weight: 600;
       margin-bottom: 1rem;
-    }
-
-    .form-label {
-      display: block;
-      margin-bottom: 0.5rem;
-      text-align: left;
-      margin-left: 3.5rem;
-    }
-
-    .form-control {
-      font-size: 0.9rem;
-      padding: 10px;
-      width: 80%;
-      margin-bottom: 1rem;
-      margin-left: 10%;
     }
 
     .btn-primary {
       background-color: #1b4965;
       border-color: #1b4965;
-      padding: 12px 20px;
+      padding: 10px 20px;
       font-size: 1rem;
-      width: 80%;
-      margin: 0 auto;
+      width: 100%;
+      border-radius: 50px;
     }
 
     .btn-primary:hover {
@@ -105,17 +87,29 @@
     #feedback.error {
       color: red;
     }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+        max-width: 100%;
+      }
+
+      .left {
+        display: none;
+      }
+
+      .right {
+        padding: 2rem;
+      }
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <!-- Left Column (Image/Logo) -->
     <div class="left">
       <img src="assets/img/logo.png" alt="LGU Logo" />
     </div>
-
-    <!-- Right Column (Forgot Password Form) -->
     <div class="right">
       <div class="card-header">Forgot Password</div>
       <form id="forgotPasswordForm">
@@ -133,43 +127,34 @@
       </div>
     </div>
   </div>
-
-  <!-- Bootstrap JS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      const forgotPasswordForm = document.getElementById("forgotPasswordForm");
+    document.getElementById("forgotPasswordForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
       const feedback = document.getElementById("feedback");
+      const formData = new FormData(this);
+      formData.append("action", "forgot_password");
 
-      forgotPasswordForm.addEventListener("submit", async function(e) {
-        e.preventDefault();
+      try {
+        const response = await fetch("api/auth.php", {
+          method: "POST",
+          body: formData,
+        });
 
-        const formData = new FormData(forgotPasswordForm);
-        formData.append("action", "forgot_password");
-
-        try {
-          const response = await fetch("api/auth.php", {
-            method: "POST",
-            body: formData,
-          });
-
-          const data = await response.json();
-
-          if (response.ok) {
-            feedback.className = "success";
-            feedback.textContent = "A reset link has been sent to your email.";
-            feedback.style.display = "block";
-          } else {
-            feedback.className = "error";
-            feedback.textContent = data.message || "Failed to send reset link. Please try again.";
-            feedback.style.display = "block";
-          }
-        } catch (error) {
+        const data = await response.json();
+        if (response.ok) {
+          feedback.className = "success";
+          feedback.textContent = "A reset link has been sent to your email.";
+          feedback.style.display = "block";
+        } else {
           feedback.className = "error";
-          feedback.textContent = "An error occurred. Please try again.";
+          feedback.textContent = data.message || "Failed to send reset link.";
           feedback.style.display = "block";
         }
-      });
+      } catch {
+        feedback.className = "error";
+        feedback.textContent = "An error occurred.";
+        feedback.style.display = "block";
+      }
     });
   </script>
 </body>
