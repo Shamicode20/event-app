@@ -19,11 +19,13 @@ CREATE TABLE `event_participants` (
 
 CREATE TABLE `users` (
  `id` int NOT NULL AUTO_INCREMENT,
- `name` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
- `email` varchar(191) COLLATE utf8mb4_general_ci NOT NULL,
- `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
- `role` enum('user','admin') COLLATE utf8mb4_general_ci DEFAULT 'user',
+ `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+ `email` varchar(191) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+ `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+ `role` enum('user','admin') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT 'user',
  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+ `reset_token` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+ `reset_expires` datetime DEFAULT NULL,
  PRIMARY KEY (`id`),
  UNIQUE KEY `email` (`email`)
-) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
