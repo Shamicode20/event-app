@@ -27,107 +27,44 @@ include '../../includes/sidebar.php';
 ?>
 
 <style>
-    /* Modal Styles */
+    /* Responsive Styles for Modals, Table, and Light/Dark Mode */
     .modal-content {
         border-radius: 8px;
         background-color: #ffffff;
-        /* Default light mode background */
         color: #1B4965;
-        /* Default light mode text color */
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         transition: background-color 0.3s, color 0.3s;
     }
-
-    .modal-header,
-    .modal-footer {
-        background-color: #f8f9fa;
-        /* Light background for modal header/footer */
-        border-color: #e9ecef;
-        /* Light border for modal header/footer */
-    }
-
-    .modal-body {
-        background-color: #ffffff;
-        /* Light background for modal body */
-        color: #1B4965;
-        /* Light text color for modal body */
-    }
-
     body.dark-mode .modal-content {
         background-color: #2c2c2c;
-        /* Dark mode background */
         color: #e0e0e0;
-        /* Dark mode text color */
     }
-
-    body.dark-mode .modal-header,
-    body.dark-mode .modal-footer {
-        background-color: #333;
-        /* Dark background for modal header/footer */
-        border-color: #444;
-        /* Dark border for modal header/footer */
+    .table-responsive {
+        overflow-x: auto;
     }
-
-    body.dark-mode .modal-body {
-        background-color: #2c2c2c;
-        /* Dark mode background for modal body */
+    body.dark-mode .table {
         color: #e0e0e0;
-        /* Dark mode text color for modal body */
     }
-
-    /* Buttons inside modals */
-    .modal-footer .btn {
-        font-weight: bold;
-        transition: background-color 0.3s, color 0.3s;
-    }
-
-    .modal-footer .btn-primary {
-        background-color: #4a90e2;
-        border-color: #4a90e2;
-        color: white;
-    }
-
-    .modal-footer .btn-primary:hover {
-        background-color: #3b78c2;
-        border-color: #3b78c2;
-    }
-
-    body.dark-mode .modal-footer .btn-primary {
-        background-color: #3b78c2;
-        /* Dark mode button background */
-        border-color: #3b78c2;
-        /* Dark mode button border */
-        color: white;
-        /* Maintain light text for visibility */
-    }
-
-    body.dark-mode .modal-footer .btn-primary:hover {
-        background-color: #336699;
-        /* Slightly darker on hover for dark mode */
-        border-color: #336699;
-    }
-
-    /* Scrollbar for modal body */
-    .modal-body::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .modal-body::-webkit-scrollbar-thumb {
-        background-color: #dcdcdc;
-        /* Light mode scrollbar */
-        border-radius: 3px;
-    }
-
-    body.dark-mode .modal-body::-webkit-scrollbar-thumb {
-        background-color: #555;
-        /* Dark mode scrollbar */
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .d-flex {
+            flex-wrap: wrap;
+        }
+        .form-control.d-inline-block {
+            width: 100%;
+            margin-bottom: 10px;
+        }
     }
 </style>
 
 <div id="page-content-wrapper">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Users</h2>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">Create User</button>
+        <div>
+            <input type="text" id="searchInput" class="form-control d-inline-block w-auto" placeholder="Search..." onkeyup="filterTable()">
+            <button class="btn btn-secondary ms-2" onclick="exportToCSV()">Export CSV</button>
+            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">Create User</button>
+        </div>
     </div>
 
     <!-- Display success or error messages -->
@@ -144,7 +81,7 @@ include '../../includes/sidebar.php';
     <?php endif; ?>
 
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-hover" id="usersTable">
             <thead>
                 <tr>
                     <th>#</th>
@@ -193,8 +130,42 @@ include '../../includes/sidebar.php';
     </div>
 </div>
 
-<!-- Modals -->
-<!-- Create User Modal -->
+<script>
+    // Search Functionality
+    function filterTable() {
+        const input = document.getElementById('searchInput').value.toLowerCase();
+        const table = document.getElementById('usersTable');
+        const rows = table.querySelectorAll('tbody tr');
+
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            const rowText = Array.from(cells).map(cell => cell.textContent.toLowerCase()).join(' ');
+            row.style.display = rowText.includes(input) ? '' : 'none';
+        });
+    }
+
+    // Export to CSV
+    function exportToCSV() {
+        const rows = document.querySelectorAll('#usersTable tr');
+        let csvContent = "";
+
+        rows.forEach(row => {
+            const columns = row.querySelectorAll('th, td');
+            const rowData = Array.from(columns).map(column => `"${column.textContent}"`).join(",");
+            csvContent += rowData + "\r\n";
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('href', url);
+        a.setAttribute('download', 'users_report.csv');
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+</script>
+
+<!-- Modals (Create, Edit, Delete) -->
 <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -204,7 +175,6 @@ include '../../includes/sidebar.php';
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="modal-feedback" style="display: none;"></div>
                     <div class="mb-3">
                         <label for="name" class="form-label">Name</label>
                         <input type="text" class="form-control" id="name" name="name" required>
@@ -234,160 +204,4 @@ include '../../includes/sidebar.php';
     </div>
 </div>
 
-<!-- Edit User Modal -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form id="editUserForm">
-                <input type="hidden" id="editUserId" name="id">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Edit User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="modal-feedback" style="display: none;"></div>
-                    <div class="mb-3">
-                        <label for="editName" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="editName" name="name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editEmail" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="editEmail" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editRole" class="form-label">Role</label>
-                        <select class="form-control" id="editRole" name="role" required>
-                            <option value="user">User</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-warning">Update User</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Delete User Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form id="deleteUserForm">
-                <input type="hidden" id="deleteUserId" name="id">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Delete User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="modal-feedback" style="display: none;"></div>
-                    Are you sure you want to delete this user?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 <?php include '../../includes/footer.php'; ?>
-<script src="../../assets/js/main.js"></script> <!-- Custom JS -->
-
-
-<script>
-    function showModalFeedback(modalId, message, type = 'success') {
-        const modal = document.querySelector(`#${modalId}`);
-        const feedbackDiv = modal.querySelector('.modal-feedback');
-        feedbackDiv.style.display = 'block';
-        feedbackDiv.className = 'modal-feedback text-' + (type === 'success' ? 'success' : 'danger');
-        feedbackDiv.textContent = message;
-    }
-
-    document.getElementById('createUserForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-
-        fetch('../../api/create_user.php', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showModalFeedback('createModal', data.message, 'success');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showModalFeedback('createModal', data.message, 'error');
-                }
-            });
-    });
-
-    // Populate Edit Modal with User Data
-    document.querySelectorAll('.edit-user-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            document.getElementById('editUserId').value = this.dataset.id;
-            document.getElementById('editName').value = this.dataset.name;
-            document.getElementById('editEmail').value = this.dataset.email;
-            document.getElementById('editRole').value = this.dataset.role;
-        });
-    });
-
-    // Handle Edit User Form Submission
-    document.getElementById('editUserForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-
-        fetch('../../api/edit_user.php', {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showModalFeedback('editModal', data.message, 'success');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showModalFeedback('editModal', data.message, 'error');
-                }
-            })
-            .catch(error => {
-                showModalFeedback('editModal', 'An error occurred. Please try again.', 'error');
-                console.error('Error:', error);
-            });
-    });
-
-    // Populate Delete Modal with User ID
-    document.querySelectorAll('.delete-user-btn').forEach(button => {
-        button.addEventListener('click', function() {
-            document.getElementById('deleteUserId').value = this.dataset.id;
-        });
-    });
-
-    // Handle Delete User Form Submission
-    document.getElementById('deleteUserForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(this);
-
-        fetch('../../api/delete_user.php', {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showModalFeedback('deleteModal', data.message, 'success');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showModalFeedback('deleteModal', data.message, 'error');
-                }
-            })
-            .catch(error => {
-                showModalFeedback('deleteModal', 'An error occurred. Please try again.', 'error');
-                console.error('Error:', error);
-            });
-    });
-</script>

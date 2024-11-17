@@ -105,7 +105,7 @@ if ($method === 'POST' && isset($_POST['action']) && $_POST['action'] === 'regis
         exit;
     }
 
-    $loginLink = "http://127.0.0.22/login.php";
+    $loginLink = "https://barangayevents.smartbarangayconnect.com/login.php";
     sendEmail($email, 'Welcome to LGU 4', "Dear $name,\n\nWelcome to LGU 4! You can log in using the following link: $loginLink\n\nBest regards,\nLGU 4 Team");
 
     echo json_encode(['message' => 'Registration successful. A welcome email has been sent.']);
@@ -127,7 +127,7 @@ if ($method === 'POST' && isset($_POST['action']) && $_POST['action'] === 'forgo
     $stmt = $conn->prepare("UPDATE users SET reset_token = :token, reset_expires = DATE_ADD(NOW(), INTERVAL 1 HOUR) WHERE email = :email");
     $stmt->execute([':token' => $token, ':email' => $email]);
 
-    $resetLink = "http://127.0.0.22/reset_password.php?token=$token";
+    $resetLink = "https://barangayevents.smartbarangayconnect.com/reset_password.php?token=$token";
     sendEmail($email, 'Password Reset Request', "Click the link to reset your password: $resetLink\n\nThis link will expire in 1 hour.");
 
     echo json_encode(['message' => 'If this email exists, a reset link has been sent.']);

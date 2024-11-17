@@ -1,9 +1,9 @@
 <?php
 // Database configuration
 $host = 'localhost';  // Database host
-$db_name = 'event_app';  // Database name
-$username = 'root';  // Database username
-$password = '';  // Database password (update accordingly)
+$db_name = 'bara_event_app';  // Database name
+$username = 'bara_event_app';  // Database username
+$password = 'bara_event_app';  // Database password (update accordingly)
 
 try {
     $conn = new PDO("mysql:host=$host;dbname=$db_name;charset=utf8mb4", $username, $password);
