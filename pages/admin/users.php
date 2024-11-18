@@ -32,53 +32,85 @@ include '../../includes/sidebar.php';
         overflow-x: auto;
     }
 
-    /* Dark and Light Mode Styles */
-    .btn-custom {
-        font-weight: bold;
-        transition: background-color 0.3s, color 0.3s;
+    /* Responsive Table for Small Screens */
+    @media (max-width: 768px) {
+        table thead {
+            display: none; /* Hide table headers on smaller screens */
+        }
+
+        table tbody tr {
+            display: block;
+            margin-bottom: 15px;
+            border: 1px solid #ddd; /* Add border around rows for clarity */
+            border-radius: 5px;
+            padding: 10px;
+            background: #fff; /* Ensure visibility on dark mode */
+        }
+
+        table tbody td {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #ddd;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        table tbody td::before {
+            content: attr(data-label); /* Use data-label attribute as header text */
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #555;
+            margin-right: 10px;
+        }
+
+        .btn {
+            font-size: 14px;
+            padding: 6px 10px;
+        }
     }
 
-    .btn-custom.light {
-        background-color: #4a90e2;
-        color: white;
+    /* Add spacing for mobile-friendly buttons */
+    @media (max-width: 768px) {
+        .btn {
+            margin-top: 5px;
+        }
     }
 
-    .btn-custom.light:hover {
-        background-color: #3b78c2;
-    }
-
-    body.dark-mode .btn-custom {
-        background-color: #3b78c2;
-        color: white;
-    }
-
-    body.dark-mode .btn-custom:hover {
-        background-color: #336699;
-    }
-
-    body.dark-mode .modal-content {
-        background-color: #2c2c2c;
-        color: #e0e0e0;
-    }
-
-    body.dark-mode .modal-header,
-    body.dark-mode .modal-footer {
+    /* Dark Mode Adjustments */
+    body.dark-mode table tbody tr {
         background-color: #333;
-        border-color: #444;
+        color: #fff;
     }
 
-    body.dark-mode .modal-body {
-        background-color: #2c2c2c;
-        color: #e0e0e0;
+    body.dark-mode table tbody td {
+        border-bottom: 1px solid #444;
+    }
+
+    body.dark-mode table tbody td::before {
+        color: #aaa;
+    }
+
+    /* Adjust input fields and buttons for mobile screens */
+    @media (max-width: 576px) {
+        #searchInput {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn-custom,
+        .btn-primary {
+            width: 100%;
+            margin-bottom: 10px;
+        }
     }
 </style>
 
 <div id="page-content-wrapper">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
         <h2>Users</h2>
-        <div>
+        <div class="d-flex flex-wrap">
             <input type="text" id="searchInput" class="form-control d-inline-block w-auto" placeholder="Search Users" style="margin-right: 10px;">
-            <button class="btn btn-custom light" id="exportCsvBtn">Export CSV</button>
+            <button class="btn btn-custom light" id="exportCsvBtn" style="margin-right: 10px;">Export CSV</button>
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">Create User</button>
         </div>
     </div>
@@ -112,12 +144,14 @@ include '../../includes/sidebar.php';
                 <?php if (!empty($users)) : ?>
                     <?php foreach ($users as $index => $user) : ?>
                         <tr>
-                            <td><?php echo $index + 1; ?></td>
-                            <td><?php echo htmlspecialchars($user['name']); ?></td>
-                            <td><?php echo htmlspecialchars($user['email']); ?></td>
-                            <td><?php echo htmlspecialchars($user['role']); ?></td>
-                            <td><?php echo htmlspecialchars(date('F j, Y, g:i A', strtotime($user['created_at']))); ?></td>
-                            <td>
+                            <td data-label="#"> <?php echo $index + 1; ?> </td>
+                            <td data-label="Name"> <?php echo htmlspecialchars($user['name']); ?> </td>
+                            <td data-label="Email"> <?php echo htmlspecialchars($user['email']); ?> </td>
+                            <td data-label="Role"> <?php echo htmlspecialchars($user['role']); ?> </td>
+                            <td data-label="Created At"> 
+                                <?php echo htmlspecialchars(date('F j, Y, g:i A', strtotime($user['created_at']))); ?>
+                            </td>
+                            <td data-label="Actions">
                                 <button class="btn btn-warning btn-sm edit-user-btn"
                                     data-bs-toggle="modal"
                                     data-bs-target="#editModal"
@@ -146,106 +180,6 @@ include '../../includes/sidebar.php';
     </div>
 </div>
 
-<!-- Modals -->
-<!-- Create User Modal -->
-<div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form id="createUserForm">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createModalLabel">Create User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="modal-feedback" style="display: none;"></div>
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="role" class="form-label">Role</label>
-                        <select class="form-control" id="role" name="role" required>
-                            <option value="user">User</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Create User</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Modal -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form id="editUserForm">
-                <input type="hidden" id="editUserId" name="id">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Edit User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="modal-feedback" style="display: none;"></div>
-                    <div class="mb-3">
-                        <label for="editName" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="editName" name="name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editEmail" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="editEmail" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editRole" class="form-label">Role</label>
-                        <select class="form-control" id="editRole" name="role" required>
-                            <option value="user">User</option>
-                            <option value="admin">Admin</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-warning">Update User</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Delete Modal -->
-<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <form id="deleteUserForm">
-                <input type="hidden" id="deleteUserId" name="id">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Delete User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="modal-feedback" style="display: none;"></div>
-                    Are you sure you want to delete this user?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <script>
     // Search Functionality
